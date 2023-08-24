@@ -2,7 +2,7 @@
 
 #include "Module.h"
 
-#include <interfaces/IGreeter.h>
+#include <interfaces/IBeer.h>
 
 namespace WPEFramework {
 namespace Plugin {
@@ -41,13 +41,7 @@ namespace Plugin {
         };
 
     public:
-        RustyPlugin()
-            : _connectionId(0)
-            , _service(nullptr)
-            , _greeter(nullptr)
-            , _notification(this)
-        {
-        }
+        RustyPlugin();
         ~RustyPlugin() override = default;
 
         RustyPlugin(RustyPlugin&&) = delete;
@@ -59,7 +53,7 @@ namespace Plugin {
         BEGIN_INTERFACE_MAP(RustyPlugin)
         INTERFACE_ENTRY(PluginHost::IPlugin)
         INTERFACE_ENTRY(PluginHost::IDispatcher)
-        INTERFACE_AGGREGATE(Exchange::IGreeter, _greeter)
+        INTERFACE_AGGREGATE(Exchange::IBeer, _beer)
         END_INTERFACE_MAP
 
         // IPlugin Methods
@@ -74,7 +68,7 @@ namespace Plugin {
         uint32_t _connectionId;
         PluginHost::IShell* _service;
 
-        Exchange::IGreeter* _greeter;
+        Exchange::IBeer* _beer;
         Core::Sink<Notification> _notification;
     };
 }

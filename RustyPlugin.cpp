@@ -18,7 +18,7 @@
  */
 
 #include "RustyPlugin.h"
-#include <interfaces/json/JGreeter.h>
+#include <interfaces/json/JBeer.h>
 
 namespace WPEFramework {
 
@@ -37,6 +37,14 @@ namespace Plugin {
             {});
     }
 
+    RustyPlugin::RustyPlugin()
+        : _connectionId(0)
+        , _service(nullptr)
+        , _beer(nullptr)
+        , _notification(this)
+    {
+    }
+
     const string RustyPlugin::Initialize(PluginHost::IShell* service)
     {
         ASSERT(_service == nullptr);
@@ -49,11 +57,11 @@ namespace Plugin {
 
         _service->Register(&_notification);
 
-        _greeter = _service->Root<Exchange::IGreeter>(_connectionId, 2000, _T("RustProxy"));
-        if (_greeter) {
-            Exchange::JGreeter::Register(*this, _greeter);
+        _beer = _service->Root<Exchange::IBeer>(_connectionId, 2000, _T("RustProxy"));
+        if (_beer) {
+            Exchange::JBeer::Register(*this, _beer);
         } else {
-            result = "Failed to create RustProxy instance";
+            result = "Failed to create RustProxy instance for IBeer";
         }
 
         return result;
@@ -66,12 +74,12 @@ namespace Plugin {
 
             _service->Unregister(&_notification);
 
-            if (_greeter != nullptr) {
+            if (_beer != nullptr) {
                 RPC::IRemoteConnection* connection(_service->RemoteConnection(_connectionId));
 
-                VARIABLE_IS_NOT_USED uint32_t result = _greeter->Release();
+                VARIABLE_IS_NOT_USED uint32_t result = _beer->Release();
                 ASSERT(result == Core::ERROR_DESTRUCTION_SUCCEEDED);
-                _greeter = nullptr;
+                _beer = nullptr;
 
                 if (connection != nullptr) {
                     connection->Terminate();
@@ -88,6 +96,16 @@ namespace Plugin {
     string RustyPlugin::Information() const
     {
         return {};
+    }
+
+    void RustyPlugin::Deactivated(RPC::IRemoteConnection* connection)
+    {
+        if (connection->Id() == _connectionId) {
+            ASSERT(_service != nullptr);
+            Core::IWorkerPool::Instance().Submit(PluginHost::IShell::Job::Create(_service,
+                PluginHost::IShell::DEACTIVATED,
+                PluginHost::IShell::FAILURE));
+        }
     }
 }
 }

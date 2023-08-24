@@ -2,18 +2,12 @@
 
 #include "Module.h"
 
-#include <interfaces/IGreeter.h>
+#include <interfaces/IBeer.h>
 
-// Methods from Rust
-extern "C" {
-    extern char *greeting_generate(const char *name);
-    extern void greeting_free(char *);
-}
-// End methods from Rust
 
 namespace WPEFramework {
 namespace Plugin {
-    class RustProxy : public Exchange::IGreeter {
+    class RustProxy : public Exchange::IBeer {
     public:
         RustProxy() = default;
         ~RustProxy() override = default;
@@ -25,11 +19,13 @@ namespace Plugin {
         RustProxy& operator=(const RustProxy&) = delete;
 
         BEGIN_INTERFACE_MAP(RustProxy)
-        INTERFACE_ENTRY(Exchange::IGreeter)
+        INTERFACE_ENTRY(Exchange::IBeer)
         END_INTERFACE_MAP
 
-        // IGreeter methods
-        Core::hresult SayHello(const string name, string& message) override;
+        // IBeer methods
+        Core::hresult GetBeers(IBeerIterator*& beers /* @out */) override;
+        Core::hresult GetBeersByName(string name /* @in */, IBeerIterator*& beers /* @out */) override;
+        Core::hresult GetBeer(uint32_t id /* @in */, Beer& beer /* @out */) override;
     };
 }
 }
