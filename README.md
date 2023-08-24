@@ -1,3 +1,0 @@
-```
-cargo install --force cbindgen
-```
