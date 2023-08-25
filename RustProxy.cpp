@@ -1,7 +1,6 @@
 #include "Module.h"
 
 #include "RustProxy.h"
-#include <openssl/evp.h>
 #include <rust_beer_bridge/lib.h>
 
 namespace WPEFramework {
